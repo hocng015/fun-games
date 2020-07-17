@@ -56,45 +56,21 @@ void handle_events() {
 
 	switch (event.type) {
 	case SDL_QUIT:
-		running = false;
+		running = FALSE;
 		break;
 	case SDL_KEYDOWN:
-		if (event.key.keysym.sym == SDLK_ESCAPE) {
-			running = false;
-		}
-		else if (event.key.keysym.sym == SDLK_LEFT) {
-			paddle.vel_x = -500;
-			if (event.key.keysym.sym == SDLK_a) {
-				paddle2.vel_x = -500;
-			}
-			else if (event.key.keysym.sym == SDLK_d) {
-				paddle2.vel_x = 500;
-			}
-		}
-		else if (event.key.keysym.sym == SDLK_RIGHT) {
-			paddle.vel_x = 500;
-			if (event.key.keysym.sym == SDLK_a) {
-				paddle2.vel_x = -500;
-			}
-			else if (event.key.keysym.sym == SDLK_d) {
-				paddle2.vel_x = 500;
-			}
-		}
+		if (event.key.keysym.sym == SDLK_ESCAPE)
+			running = FALSE;
+		if (event.key.keysym.sym == SDLK_LEFT)
+			paddle.vel_x = -400;
+		if (event.key.keysym.sym == SDLK_RIGHT)
+			paddle.vel_x = +400;
 		break;
-		//now we need to make sure the paddle returns back to a velocity of 0 so that it stays in postion when there is no input
 	case SDL_KEYUP:
-		if (event.key.keysym.sym == SDLK_LEFT) {
+		if (event.key.keysym.sym == SDLK_LEFT)
 			paddle.vel_x = 0;
-		}
-		else if (event.key.keysym.sym == SDLK_RIGHT) {
+		if (event.key.keysym.sym == SDLK_RIGHT)
 			paddle.vel_x = 0;
-		}
-		else if (event.key.keysym.sym == SDLK_a) {
-			paddle2.vel_x = 0;
-		}
-		else if (event.key.keysym.sym == SDLK_d) {
-			paddle2.vel_x = 0;
-		}
 		break;
 	}
 }
@@ -110,23 +86,34 @@ void update() {
 
 	last_frame_time = SDL_GetTicks();
 
+	if (ball.y + ball.height < 0)
+		ball.vel_y = -ball.vel_y;
+
 	if (ball.x + ball.width > WINDOW_WIDTH || ball.x < 0)
 		ball.vel_x = -ball.vel_x;
-
-	if (ball.y < 0)
-		ball.vel_y = -ball.vel_y;
 
 	if (ball.y + ball.height >= paddle.y && ball.x + ball.width > paddle.x && ball.x < paddle.x + paddle.width)
 		ball.vel_y = -ball.vel_y;
 
+	if (ball.y + ball.height <= paddle2.y && ball.x + ball.width > paddle2.x && ball.x < paddle2.x + paddle2.width)
+		ball.vel_y = -ball.vel_y;
+
 	if (ball.y + ball.height > WINDOW_HEIGHT)
 		running = FALSE;
+
+	if (paddle2.vel_x == 0)
+		paddle2.vel_x = 600;
+
+	if (((paddle2.x + paddle2.width) >= WINDOW_WIDTH) || ((paddle2.x + paddle2.width) < 0))
+	paddle2.vel_x = -paddle2.vel_x;
 
 	ball.x += ball.vel_x * delta_time;
 	ball.y += ball.vel_y * delta_time;
 
 	paddle.x += paddle.vel_x * delta_time;
 	paddle.y += paddle.vel_y * delta_time;
+
+	paddle2.x += paddle2.vel_x * delta_time;
 }
 
 void render() {
